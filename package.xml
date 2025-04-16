@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>phidget_ros_drivers</name>
+  <version>1.0.0</version>
+  <description>The phiget_ros_drivers package</description>
+  <maintainer email="root@todo.todo">root</maintainer>
+
+  <license>TODO</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <export>
+
+  </export>
+</package>
