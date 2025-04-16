@@ -1,0 +1,72 @@
+loadcells:
+  726AR:
+    serial: 726AR
+    offset: 0.000119864009
+    value_at_calib: 0.0015
+    calibration_mass_kg: 1.0
+    type: "Load cell"
+    product_family: "CK Y1"
+    design: "Miniature bending beam"
+    direction: "compression"
+    application: "mass"
+    capacity_kg: 30
+    output_mV_per_V: 1.5
+    ip_rating: IP66
+    material: "steel, galvanized"
+    oiml_class: "C1"
+    combined_error: 0.0005
+    notes: ""
+
+  811AR:
+    serial: 811AR
+    offset: 4.1962e-05
+    value_at_calib: 0.0015
+    calibration_mass_kg: 1.0
+    type: "Load cell"
+    product_family: "CK Y1"
+    design: "Miniature bending beam"
+    direction: "compression"
+    application: "mass"
+    capacity_kg: 30
+    output_mV_per_V: 1.5
+    ip_rating: IP66
+    material: "steel, galvanized"
+    oiml_class: "C1"
+    combined_error: 0.0005
+    notes: ""
+
+  792AR:
+    serial: 792AR
+    offset: -2.0623e-05
+    value_at_calib: 0.0015
+    calibration_mass_kg: 1.0
+    type: "Load cell"
+    product_family: "CK Y1"
+    design: "Miniature bending beam"
+    direction: "compression"
+    application: "mass"
+    capacity_kg: 30
+    output_mV_per_V: 1.5
+    ip_rating: IP66
+    material: "steel, galvanized"
+    oiml_class: "C1"
+    combined_error: 0.0005
+    notes: ""
+
+  782AR:
+    serial: 782AR
+    offset: 0.000185013
+    value_at_calib: 0.0015
+    calibration_mass_kg: 1.0
+    type: "Load cell"
+    product_family: "CK Y1"
+    design: "Miniature bending beam"
+    direction: "compression"
+    application: "mass"
+    capacity_kg: 30
+    output_mV_per_V: 1.5
+    ip_rating: IP66
+    material: "steel, galvanized"
+    oiml_class: "C1"
+    combined_error: 0.0005
+    notes: ""

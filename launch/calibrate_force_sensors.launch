@@ -1,0 +1,19 @@
+<launch>
+    <!-- Tolerance for detecting stable tare readings -->
+    <param name="tolerance" value="0.000001" />
+
+    <!-- Known weight (kg) for sensitivity calibration -->
+    <param name="known_weight" value="1.0" />
+
+    <!-- Select PhidgetBridge channels for sensitivity calibration -->
+    <rosparam param="channels">[0, 1, 2, 3]</rosparam>
+
+    <!-- Calibration files for each sensor -->
+    <param name="calibration_file_0" value="$(find phidget_ros_drivers)/config/sensor_0.yaml" />
+    <param name="calibration_file_1" value="$(find phidget_ros_drivers)/config/sensor_1.yaml" />
+    <param name="calibration_file_2" value="$(find phidget_ros_drivers)/config/sensor_2.yaml" />
+    <param name="calibration_file_3" value="$(find phidget_ros_drivers)/config/sensor_3.yaml" />
+
+    <!-- Start the calibration node -->
+    <node pkg="phidget_ros_drivers" type="phidget_calibration.py" name="calibration_node" output="screen" />
+</launch>

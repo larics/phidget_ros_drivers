@@ -1,8 +1,6 @@
 <launch>
   <node name="force_sensor_node" pkg="phidget_ros_drivers" type="phiget_force_sensor.py" output="screen">
-    <param name="calibration_file_0" value="$(find phidget_ros_drivers)/config/sensor_0.yaml" />
-    <param name="calibration_file_1" value="$(find phidget_ros_drivers)/config/sensor_1.yaml" />
-    <param name="calibration_file_2" value="$(find phidget_ros_drivers)/config/sensor_2.yaml" />
-    <param name="calibration_file_3" value="$(find phidget_ros_drivers)/config/sensor_3.yaml" />
+    <rosparam param="loadcell_mapping">[726AR, 811AR, 792AR, 782AR]</rosparam>
+    <param name="calibration_file" value="$(find phidget_ros_drivers)/config/loadcell_calibration.yaml" />
   </node>
 </launch>

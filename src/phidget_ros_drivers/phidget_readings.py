@@ -7,25 +7,22 @@ from std_srvs.srv import Empty, EmptyResponse
 from Phidget22.Devices.VoltageRatioInput import VoltageRatioInput
 from Phidget22.BridgeGain import BridgeGain
 
+
 class ForceSensor:
-    def __init__(self, channel_index, calibration_path):
+    def __init__(self, channel_index, calib_data):
         self.channel_index = channel_index
         self.sensor = VoltageRatioInput()
-        self.base_offset = 0.0  # From YAML
-        self.zero_offset = 0.0  # Dynamic zero
-        self.scale = 1.0
+        self.base_offset = calib_data['offset']
+        self.zero_offset = 0.0
+        self.calib_mass = calib_data.get('calibration_mass_kg', 1.0)  # default to 1.0 kg
+        self.value_at_calib = calib_data['value_at_calib']
+        self.scale = (self.calib_mass * 9.80665) / (self.value_at_calib - self.base_offset)
         self.publisher = None
-
-        self._load_calibration(calibration_path)
+        self.serial = calib_data.get("serial", f"CH{channel_index}")
+        self.metadata = calib_data
         self._init_sensor()
         self._init_publisher()
-
-    def _load_calibration(self, path):
-        with open(path, 'r') as f:
-            calib = yaml.safe_load(f)
-        self.base_offset = calib['offset']
-        raw_1kg = calib['value_at_1kg']
-        self.scale = 9.80665 / (raw_1kg - self.base_offset)  # Converts to N
+        self._log_metadata()
 
     def _init_sensor(self):
         self.sensor.setChannel(self.channel_index)
@@ -37,6 +34,13 @@ class ForceSensor:
     def _init_publisher(self):
         topic = f"/force_sensor/sensor_readings_{self.channel_index}"
         self.publisher = rospy.Publisher(topic, WrenchStamped, queue_size=10)
+
+    def _log_metadata(self):
+        rospy.loginfo(f"--- Sensor {self.channel_index} (Serial: {self.serial}) ---")
+        for key, val in self.metadata.items():
+            rospy.loginfo(f"  {key}: {val}")
+        rospy.loginfo(f"  Calculated scale: {self.scale:.6f} N / raw unit")
+        rospy.loginfo(f"  (Based on {self.calib_mass} kg calibration)\n")
 
     def read_force(self):
         raw = self.sensor.getVoltageRatio()
@@ -61,17 +65,23 @@ class ForceSensor:
         except Exception as e:
             rospy.logwarn(f"[Sensor {self.channel_index}] Read error: {e}")
 
-
 class ForceSensorNode:
     def __init__(self):
         rospy.init_node("force_sensor_node")
         self.sensors = []
         self.rate = rospy.Rate(125)
 
-        for i in range(4):
-            calib_param = f"~calibration_file_{i}"
-            calib_path = rospy.get_param(calib_param)
-            sensor = ForceSensor(i, calib_path)
+        mapping = rospy.get_param("~loadcell_mapping")
+        calib_path = rospy.get_param("~calibration_file")
+
+        with open(calib_path, 'r') as f:
+            all_calibs = yaml.safe_load(f)["loadcells"]
+
+        for i, serial in enumerate(mapping):
+            if serial not in all_calibs:
+                rospy.logerr(f"Calibration data for loadcell {serial} not found!")
+                continue
+            sensor = ForceSensor(i, all_calibs[serial])
             self.sensors.append(sensor)
 
         self.service = rospy.Service("zero_all", Empty, self.handle_zero_all)
@@ -88,4 +98,3 @@ class ForceSensorNode:
             for sensor in self.sensors:
                 sensor.publish()
             self.rate.sleep()
-
