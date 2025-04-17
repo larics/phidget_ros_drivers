@@ -74,18 +74,38 @@ class ForceSensorNode:
         mapping = rospy.get_param("~loadcell_mapping")
         calib_path = rospy.get_param("~calibration_file")
 
-        with open(calib_path, 'r') as f:
-            all_calibs = yaml.safe_load(f)["loadcells"]
+        try:
+            with open(calib_path, 'r') as f:
+                all_calibs = yaml.safe_load(f)["loadcells"]
+        except Exception as e:
+            rospy.logfatal(f"Failed to load calibration file: {e}")
+            rospy.signal_shutdown("Failed to load calibration YAML")
+            return
 
         for i, serial in enumerate(mapping):
             if serial not in all_calibs:
-                rospy.logerr(f"Calibration data for loadcell {serial} not found!")
-                continue
-            sensor = ForceSensor(i, all_calibs[serial])
+                rospy.logfatal(f"[FATAL] Loadcell '{serial}' not found in calibration file!")
+                rospy.signal_shutdown("Invalid loadcell mapping in launch file")
+                return
+
+            calib = all_calibs[serial]
+            # Check required fields
+            required_fields = ['offset', 'value_at_calib', 'calibration_mass_kg']
+            missing = [field for field in required_fields if field not in calib]
+
+            if missing:
+                rospy.logfatal(
+                    f"[FATAL] Calibration data for loadcell '{serial}' is missing required fields: {missing}"
+                )
+                rospy.signal_shutdown("Incomplete calibration data")
+                return
+
+            sensor = ForceSensor(i, calib)
             self.sensors.append(sensor)
 
         self.service = rospy.Service("zero_all", Empty, self.handle_zero_all)
         rospy.loginfo("ForceSensorNode initialized with zeroing service.")
+
 
     def handle_zero_all(self, req):
         for sensor in self.sensors:
