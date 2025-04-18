@@ -89,7 +89,6 @@ class ForceSensorNode:
                 return
 
             calib = all_calibs[serial]
-            # Check required fields
             required_fields = ['offset', 'value_at_calib', 'calibration_mass_kg']
             missing = [field for field in required_fields if field not in calib]
 
@@ -103,9 +102,10 @@ class ForceSensorNode:
             sensor = ForceSensor(i, calib)
             self.sensors.append(sensor)
 
+        self.avg_publisher = rospy.Publisher("/force_sensor/average_force", WrenchStamped, queue_size=10)
+        self.total_publisher = rospy.Publisher("/force_sensor/total_force", WrenchStamped, queue_size=10)
         self.service = rospy.Service("zero_all", Empty, self.handle_zero_all)
         rospy.loginfo("ForceSensorNode initialized with zeroing service.")
-
 
     def handle_zero_all(self, req):
         for sensor in self.sensors:
@@ -115,6 +115,32 @@ class ForceSensorNode:
 
     def run(self):
         while not rospy.is_shutdown():
+            total_force = 0.0
+            valid_count = 0
+
             for sensor in self.sensors:
-                sensor.publish()
+                sensor.publish()  # Per-channel publishing
+
+                try:
+                    force = sensor.read_force()
+                    total_force += force
+                    valid_count += 1
+                except Exception as e:
+                    rospy.logwarn(f"[Sensor {sensor.channel_index}] Read error during aggregation: {e}")
+
+            if valid_count > 0:
+                avg_force = total_force / valid_count
+
+                avg_msg = WrenchStamped()
+                avg_msg.header.stamp = rospy.Time.now()
+                avg_msg.header.frame_id = "force_sensor_avg"
+                avg_msg.wrench.force.x = avg_force
+                self.avg_publisher.publish(avg_msg)
+
+                total_msg = WrenchStamped()
+                total_msg.header.stamp = rospy.Time.now()
+                total_msg.header.frame_id = "force_sensor_total"
+                total_msg.wrench.force.x = total_force
+                self.total_publisher.publish(total_msg)
+
             self.rate.sleep()
