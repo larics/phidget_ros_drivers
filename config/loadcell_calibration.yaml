@@ -19,9 +19,9 @@ loadcells:
 
   811AR:
     serial: 811AR
-    offset: 4.1962e-05
-    value_at_calib: 0.0015
-    calibration_mass_kg: 1.0
+    offset: 0.00004024916
+    value_at_calib: 0.0001356907
+    calibration_mass_kg: 1.562
     type: "Load cell"
     product_family: "CK Y1"
     design: "Miniature bending beam"
@@ -37,9 +37,9 @@ loadcells:
 
   792AR:
     serial: 792AR
-    offset: -2.0623e-05
-    value_at_calib: 0.0015
-    calibration_mass_kg: 1.0
+    offset: -0.00001676694
+    value_at_calib: 0.00007863728
+    calibration_mass_kg: 1.562
     type: "Load cell"
     product_family: "CK Y1"
     design: "Miniature bending beam"

@@ -127,7 +127,7 @@ class CalibrationNode:
 
                     if now - self.last_log_times[i] > 0.5:
                         state_msg = "IN tolerance" if in_tol else "OUT of tolerance"
-                        rospy.loginfo(f"[Sensor {i}] Reading: {reading:.6f} | Baseline: {baseline:.6f} | {state_msg}")
+                        rospy.loginfo(f"[Sensor {i}] Reading: {reading:.11f} | Baseline: {baseline:.11f} | {state_msg}")
                         self.last_log_times[i] = now
 
                     if in_tol:
@@ -140,7 +140,7 @@ class CalibrationNode:
                             sensitivity = (avg - offset) / self.known_weight
                             self.sensitivities[i] = sensitivity
                             self.states[i] = SensorState.CALIBRATED
-                            rospy.loginfo(f"[Sensor {i}] Calibrated! Sensitivity: {sensitivity:.6f}")
+                            rospy.loginfo(f"[Sensor {i}] Calibrated! Sensitivity: {sensitivity:.11f}")
                     else:
                         self.baselines[i] = reading
                         self.buffers[i] = []
@@ -159,7 +159,7 @@ class CalibrationNode:
         rospy.loginfo("\nAll selected sensors calibrated!")
         rospy.loginfo("Final offsets and sensitivities:")
         for i in self.channels:
-            rospy.loginfo(f"  Sensor {i}: Offset = {self.offsets[i]:.6f}, Sensitivity = {self.sensitivities[i]:.6f}")
+            rospy.loginfo(f"  Sensor {i}: Offset = {self.offsets[i]:.11f}, Sensitivity = {self.sensitivities[i]:.11f}")
 
     ## @brief Runs the full calibration procedure.
     def run(self):
